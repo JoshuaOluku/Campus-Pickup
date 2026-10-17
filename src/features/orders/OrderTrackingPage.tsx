@@ -22,12 +22,13 @@ export default function OrderTrackingPage() {
 
   useEffect(() => {
     if (!profile) return
+    const customerId = profile.id
 
     async function fetchOrders() {
       const { data, error } = await supabase
         .from('orders')
         .select('id, status, total_price, pickup_slot, pickup_token, created_at, vendor:vendor_id(name)')
-        .eq('customer_id', profile.id)
+        .eq('customer_id', customerId)
         .order('created_at', { ascending: false })
 
       if (!error && data) setOrders(data as any)

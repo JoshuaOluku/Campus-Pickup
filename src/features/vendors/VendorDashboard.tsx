@@ -20,6 +20,7 @@ export default function VendorDashboard() {
 
   useEffect(() => {
     if (!vendor?.id) return
+    const vendorId = vendor.id
 
     async function fetchInitialOrders() {
       const { data, error } = await supabase
@@ -28,7 +29,7 @@ export default function VendorDashboard() {
           id, status, total_price, pickup_slot, pickup_token, created_at,
           order_items (quantity, product:product_id(name))
         `)
-        .eq('vendor_id', vendor.id)
+        .eq('vendor_id', vendorId)
         .in('status', ['paid', 'preparing'])
         .order('created_at', { ascending: false })
 
@@ -39,9 +40,9 @@ export default function VendorDashboard() {
     fetchInitialOrders()
 
     const channel = supabase
-      .channel(`vendor-orders-${vendor.id}`)
+      .channel(`vendor-orders-${vendorId}`)
       .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'orders', filter: `vendor_id=eq.${vendor.id}` }, 
+        { event: '*', schema: 'public', table: 'orders', filter: `vendor_id=eq.${vendorId}` }, 
         () => {
           fetchInitialOrders()
         }

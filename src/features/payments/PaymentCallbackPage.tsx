@@ -21,9 +21,11 @@ export default function PaymentCallbackPage() {
       return
     }
 
+    const paymentReference: string = reference
+
     async function verify() {
       try {
-        const result = await verifyPaystackPayment(reference)
+        const result = await verifyPaystackPayment(paymentReference)
         if (result.success) {
           setStatus('success')
           setMessage('Payment successful! Your order has been placed.')

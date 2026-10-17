@@ -37,6 +37,7 @@ export default function VendorMenuPage() {
     async function fetchMenu() {
       if (!slug) return
 
+      // Fetch Vendor
       const { data: vendorData } = await supabase
         .from('vendors')
         .select('id, name, description')
@@ -46,6 +47,7 @@ export default function VendorMenuPage() {
       if (vendorData) {
         setVendor(vendorData)
 
+        // Fetch Categories
         const { data: catData } = await supabase
           .from('categories')
           .select('id, name')
@@ -55,6 +57,7 @@ export default function VendorMenuPage() {
 
         if (catData) setCategories(catData)
 
+        // Fetch Products
         const { data: prodData } = await supabase
           .from('products')
           .select('id, name, description, price, category_id')
@@ -92,13 +95,24 @@ export default function VendorMenuPage() {
       {/* Header */}
       <div className="bg-surface border-b border-soft-slate sticky top-0 z-10">
         <div className="max-w-sm mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-campus-blue">
+          
+          {/* ACCESSIBILITY UPDATE: Added aria-label */}
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 -ml-2 text-campus-blue" 
+            aria-label="Go back to previous page"
+          >
             <ArrowLeft className="w-6 h-6" />
           </button>
+          
           <h1 className="font-bold text-ink text-lg">{vendor?.name}</h1>
           
-          {/* UPDATED: Wrapped in Link to navigate to /cart */}
-          <Link to="/cart" className="relative p-2 -mr-2 text-campus-blue">
+          {/* ACCESSIBILITY UPDATE: Added aria-label */}
+          <Link 
+            to="/cart" 
+            className="relative p-2 -mr-2 text-campus-blue" 
+            aria-label="View shopping cart"
+          >
             <ShoppingCart className="w-6 h-6" />
             {itemCount > 0 && (
               <span className="absolute top-0 right-0 bg-electric-orange text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
@@ -137,6 +151,7 @@ export default function VendorMenuPage() {
                           price: product.price
                         })}
                         className="bg-warm-orange text-electric-orange p-2 rounded-lg hover:bg-orange-100 transition-colors flex-shrink-0"
+                        aria-label={`Add ${product.name} to cart`}
                       >
                         <Plus className="w-5 h-5" />
                       </button>

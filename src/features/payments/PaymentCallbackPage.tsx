@@ -14,7 +14,6 @@ export default function PaymentCallbackPage() {
 
   useEffect(() => {
     const reference = searchParams.get('reference')
-    const trxref = searchParams.get('trxref')
 
     if (!reference) {
       setStatus('failed')

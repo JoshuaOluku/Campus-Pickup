@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../auth/AuthContext'
 import { QRCodeSVG } from 'qrcode.react'
-import { Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 interface Order {
   id: string
@@ -21,7 +21,7 @@ export default function OrderTrackingPage() {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!profile?.id) return
+    if (!profile) return
 
     async function fetchOrders() {
       const { data, error } = await supabase

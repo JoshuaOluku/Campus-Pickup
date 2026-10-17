@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from './CartContext'
 import { useAuth } from '../auth/AuthContext'
-import { executeDemoCheckout } from '../checkout/checkoutService'
+import { executeDemoCheckout } from '../checkout/CheckoutService'
 import { ArrowLeft, Minus, Plus, Trash2, Clock } from 'lucide-react'
 
 const PICKUP_SLOTS = [

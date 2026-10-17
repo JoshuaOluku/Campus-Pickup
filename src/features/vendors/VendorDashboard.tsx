@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../auth/AuthContext'
-import { CheckCircle, Clock, ChefHat } from 'lucide-react'
+import { CheckCircle, ChefHat } from 'lucide-react'
 
 interface Order {
   id: string
@@ -38,14 +38,11 @@ export default function VendorDashboard() {
 
     fetchInitialOrders()
 
-    // Subscribe to realtime changes for this vendor's orders
     const channel = supabase
       .channel(`vendor-orders-${vendor.id}`)
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'orders', filter: `vendor_id=eq.${vendor.id}` }, 
-        (payload) => {
-          console.log('Realtime update:', payload)
-          // Refetch to keep it simple and accurate
+        () => {
           fetchInitialOrders()
         }
       )
@@ -70,6 +67,10 @@ export default function VendorDashboard() {
 
   const formatPrice = (priceInKobo: number) => `₦${(priceInKobo / 100).toLocaleString()}`
 
+  if (!vendor) {
+    return <div className="min-h-screen bg-off-white p-4"><div className="text-campus-blue font-semibold">Loading vendor info...</div></div>
+  }
+
   if (loading) {
     return <div className="min-h-screen bg-off-white p-4"><div className="text-campus-blue font-semibold">Loading orders...</div></div>
   }
@@ -79,7 +80,9 @@ export default function VendorDashboard() {
       <div className="max-w-2xl mx-auto">
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-campus-blue">Vendor Dashboard</h1>
-          <p className="text-slate-muted">Managing: <span className="font-semibold text-ink">{vendor?.name}</span></p>
+          <p className="text-slate-muted">
+            Managing: <span className="font-semibold text-ink">{vendor.name}</span>
+          </p>
         </header>
 
         {orders.length === 0 ? (

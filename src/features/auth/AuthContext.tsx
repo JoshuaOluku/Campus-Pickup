@@ -25,7 +25,7 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   profile: Profile | null
-  vendor: VendorInfo | null // New: Vendor details if user is a vendor with a shop
+  vendor: VendorInfo | null
   loading: boolean
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
@@ -77,28 +77,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (profileData) {
         setProfile(profileData as Profile)
         
-        // If user is a vendor, check for vendor_staff assignment
         if (profileData.role === 'vendor') {
           const { data: staffData, error: staffError } = await supabase
             .from('vendor_staff')
-            .select(`
-              id,
-              role,
-              vendor:vendor_id (id, name, slug)
-            `)
+            .select(`id, role, vendor:vendor_id (id, name, slug)`)
             .eq('profile_id', userId)
             .eq('is_active', true)
             .maybeSingle()
 
-          if (!staffError && staffData && staffData.vendor) {
-            setVendor({
-              id: staffData.vendor.id,
-              name: staffData.vendor.name,
-              slug: staffData.vendor.slug,
-              staff_role: staffData.role
-            })
+          if (!staffError && staffData) {
+            const v = Array.isArray(staffData.vendor) ? staffData.vendor[0] : staffData.vendor
+            if (v) {
+              setVendor({
+                id: v.id,
+                name: v.name,
+                slug: v.slug,
+                staff_role: staffData.role
+              })
+            } else {
+              setVendor(null)
+            }
           } else {
-            setVendor(null) // Vendor role but no shop assigned
+            setVendor(null)
           }
         } else {
           setVendor(null)
@@ -108,7 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setVendor(null)
       }
     } catch (err) {
-      console.error('Error in fetchProfile:', err)
       setProfile(null)
       setVendor(null)
     } finally {

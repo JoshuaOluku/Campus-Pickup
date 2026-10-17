@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase/client'
-import { CheckCircle, XCircle, Clock } from 'lucide-react'
+import { CheckCircle, XCircle } from 'lucide-react'
 
 interface Vendor {
   id: string
@@ -9,7 +9,7 @@ interface Vendor {
   description: string
   category: string
   status: string
-  owner: { email: string } // We will join this via select
+  owner: { email: string }
 }
 
 export default function VendorApprovals() {

@@ -84,6 +84,18 @@ export default function LoginPage() {
             {isSignUp ? 'Sign In' : 'Sign Up'}
           </button>
         </p>
+
+        <div className="mt-6 border-t border-soft-slate pt-4 text-center">
+          <a
+            href="https://form.typeform.com/to/HomcqhOf"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-semibold text-electric-orange hover:underline"
+          >
+            Share your feedback
+          </a>
+          <p className="mt-1 text-xs text-slate-muted">Help us make Campus Pick-Up better.</p>
+        </div>
       </div>
     </div>
   )

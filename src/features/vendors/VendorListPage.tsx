@@ -67,6 +67,14 @@ export default function VendorListPage() {
           >
             <ShoppingBag className="w-4 h-4" /> View My Orders
           </Link>
+          <a
+            href="https://form.typeform.com/to/HomcqhOf"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-campus-blue hover:underline"
+          >
+            Share your feedback
+          </a>
         </header>
 
         {vendors.length === 0 ? (

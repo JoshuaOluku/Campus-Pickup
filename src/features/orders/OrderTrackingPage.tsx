@@ -9,7 +9,7 @@ interface Order {
   status: string
   total_price: number
   pickup_slot: string
-  pickup_token: string
+  pickup_token: string | null
   created_at: string
   vendor: { name: string }
 }
@@ -43,6 +43,7 @@ export default function OrderTrackingPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending_payment': return 'text-orange-700 bg-orange-50'
       case 'paid': return 'text-amber-warn bg-amber-50'
       case 'preparing': return 'text-blue-600 bg-blue-50'
       case 'ready': return 'text-fresh-green bg-green-50'
@@ -96,13 +97,7 @@ export default function OrderTrackingPage() {
                 {expandedOrderId === order.id && (
                   <div className="border-t border-soft-slate p-4 bg-off-white">
                     <div className="flex flex-col items-center text-center">
-                      <p className="text-sm text-slate-muted mb-2">Show this code at pickup</p>
-                      <div className="bg-white p-3 rounded-lg shadow-sm border border-soft-slate mb-3">
-                        <QRCodeSVG value={order.pickup_token} size={120} />
-                      </div>
-                      <p className="text-3xl font-mono font-bold text-campus-blue tracking-widest">
-                        {order.pickup_token}
-                      </p>
+                      {order.pickup_token ? <><p className="text-sm text-slate-muted mb-2">Show this code at pickup</p><div className="bg-white p-3 rounded-lg shadow-sm border border-soft-slate mb-3"><QRCodeSVG value={order.pickup_token} size={120} /></div><p className="text-3xl font-mono font-bold text-campus-blue tracking-widest">{order.pickup_token}</p></> : <p className="rounded-lg bg-orange-50 p-3 text-sm text-orange-800">Payment is not yet confirmed. Your pickup code will appear here once payment is successful.</p>}
                       <div className="mt-4 w-full text-left bg-surface p-3 rounded-lg border border-soft-slate">
                         <p className="text-xs text-slate-muted flex items-center gap-1">
                           <Clock className="w-3 h-3" /> Pickup Slot

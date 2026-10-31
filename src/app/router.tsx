@@ -6,6 +6,7 @@ import VendorListPage from '../features/vendors/VendorListPage'
 import VendorDashboard from '../features/vendors/VendorDashboard'
 import VendorMenuPage from '../features/catalog/VendorMenuPage'
 import CartReviewPage from '../features/cart/CartReviewPage'
+import PaymentPage from '../features/checkout/PaymentPage'
 import OrderTrackingPage from '../features/orders/OrderTrackingPage'
 import AdminDashboard from '../features/admin/AdminDashboard'
 

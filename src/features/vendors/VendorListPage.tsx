@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../auth/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
-import { Store, Clock, ShoppingBag } from 'lucide-react'
+import { Store, Clock, ShoppingBag, Search, MapPin, ArrowRight, UtensilsCrossed, ArrowLeft, Home } from 'lucide-react'
 
 interface Vendor {
   id: string
@@ -18,100 +18,47 @@ export default function VendorListPage() {
   const navigate = useNavigate()
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('All')
 
   useEffect(() => {
     async function fetchVendors() {
-      if (!profile?.campus_id) return
-      
+      if (!profile?.campus_id) { setLoading(false); return }
       const { data, error } = await supabase
         .from('vendors')
         .select('id, name, slug, description, category, avg_prep_time_minutes')
         .eq('campus_id', profile.campus_id)
         .eq('status', 'approved')
+        .eq('is_approved', true)
         .order('name')
-
-      if (!error && data) {
-        setVendors(data)
-      }
+      if (!error && data) setVendors(data)
       setLoading(false)
     }
-
     fetchVendors()
   }, [profile?.campus_id])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-off-white p-4">
-        <div className="max-w-sm mx-auto space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-32 bg-soft-slate rounded-card animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
+  const categories = useMemo(() => ['All', ...Array.from(new Set(vendors.map(v => v.category).filter(Boolean)))], [vendors])
+  const visibleVendors = useMemo(() => vendors.filter(v => (category === 'All' || v.category === category) && (v.name.toLowerCase().includes(search.toLowerCase()) || v.description?.toLowerCase().includes(search.toLowerCase()))), [vendors, category, search])
 
   return (
-    <div className="min-h-screen bg-off-white p-4 pb-20">
-      <div className="max-w-sm mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-campus-blue">Campus Pickup</h1>
-          <p className="text-slate-muted text-sm">
-            Welcome back! Select a vendor to order from.
-          </p>
-          
-          {/* NEW: Navigation link to the Orders page */}
-          <Link 
-            to="/orders" 
-            className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-electric-orange hover:underline"
-          >
-            <ShoppingBag className="w-4 h-4" /> View My Orders
-          </Link>
-          <a
-            href="https://form.typeform.com/to/HomcqhOf"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-campus-blue hover:underline"
-          >
-            Share your feedback
-          </a>
-        </header>
-
-        {vendors.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-muted">No vendors available on your campus yet.</p>
+    <main className="min-h-screen bg-[#f7f8fa] pb-24">
+      <div className="bg-white">
+        <div className="mx-auto max-w-5xl px-5 pb-7 pt-5 sm:px-8">
+          <header className="flex items-center justify-between"><button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="rounded-xl p-2 text-[#123b5d] hover:bg-slate-100"><ArrowLeft size={20}/></button>
+            <Link to="/" aria-label="Home" className="flex items-center gap-2.5 font-extrabold tracking-tight text-[#123b5d]"><Home size={18}/><span className="grid h-10 w-10 place-items-center rounded-xl bg-orange-500 text-white"><UtensilsCrossed size={21}/></span>Campus Pick-Up</Link>
+            <Link to="/orders" className="flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-orange-300 hover:text-orange-600"><ShoppingBag size={17}/> My orders</Link>
+          </header>
+          <div className="mt-9 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+            <div><p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-orange-600"><MapPin size={15}/> Your campus marketplace</p><h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">What are you craving?</h1><p className="mt-2 text-slate-500">Order ahead from campus vendors and collect when it is ready.</p></div>
+            <div className="relative w-full md:w-80"><Search className="absolute left-4 top-3.5 text-slate-400" size={18}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search vendors..." className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100"/></div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {vendors.map(vendor => (
-              <div 
-                key={vendor.id} 
-                className="bg-surface rounded-card p-4 shadow-sm border border-soft-slate hover:border-campus-blue transition-colors cursor-pointer"
-                onClick={() => navigate(`/vendor/${vendor.slug}`)}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-warm-orange rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Store className="w-6 h-6 text-electric-orange" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-ink text-lg">{vendor.name}</h3>
-                    <p className="text-xs text-slate-muted uppercase tracking-wide mb-1">
-                      {vendor.category}
-                    </p>
-                    <p className="text-sm text-slate-muted line-clamp-2">
-                      {vendor.description}
-                    </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-fresh-green font-medium">
-                      <Clock className="w-3 h-3" />
-                      <span>~{vendor.avg_prep_time_minutes} min prep</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          <div className="mt-7 flex gap-2 overflow-x-auto pb-1">{categories.map(c => <button key={c} onClick={() => setCategory(c)} className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${category === c ? 'bg-[#123b5d] text-white' : 'bg-slate-100 text-slate-600 hover:bg-orange-50 hover:text-orange-700'}`}>{c}</button>)}</div>
+        </div>
       </div>
-    </div>
+      <section className="mx-auto max-w-5xl px-5 py-8 sm:px-8">
+        <div className="mb-5 flex items-end justify-between"><div><h2 className="text-xl font-extrabold text-slate-900">Popular around campus</h2><p className="mt-1 text-sm text-slate-500">{loading ? 'Finding vendors...' : `${visibleVendors.length} vendor${visibleVendors.length === 1 ? '' : 's'} available`}</p></div><a href="https://form.typeform.com/to/HomcqhOf" target="_blank" rel="noreferrer" className="text-xs font-semibold text-orange-600 hover:underline">Give feedback</a></div>
+        {loading ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map(i => <div key={i} className="h-48 animate-pulse rounded-2xl bg-slate-200"/>)}</div> : visibleVendors.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><Store className="mx-auto mb-3 text-slate-400" size={32}/><h3 className="font-bold text-slate-800">{vendors.length ? 'No matching vendors' : 'More vendors coming soon'}</h3><p className="mt-1 text-sm text-slate-500">{vendors.length ? 'Try another search or category.' : 'We are working on bringing your campus favourites online.'}</p></div> : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{visibleVendors.map(v => <button key={v.id} onClick={() => navigate(`/vendor/${v.slug}`)} className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg"><div className="mb-5 flex items-center justify-between"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-50 text-orange-600 transition group-hover:bg-orange-500 group-hover:text-white"><Store size={23}/></span><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Available</span></div><p className="text-xs font-bold uppercase tracking-wider text-orange-600">{v.category}</p><h3 className="mt-1 text-lg font-extrabold text-slate-900">{v.name}</h3><p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-slate-500">{v.description || 'Explore the menu and order ahead.'}</p><div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-medium text-slate-500"><span className="flex items-center gap-1"><Clock size={14}/> About {v.avg_prep_time_minutes} min</span><span className="flex items-center gap-1 font-bold text-[#123b5d]">View menu <ArrowRight size={14}/></span></div></button>)}</div>}
+      </section>
+    </main>
   )
 }

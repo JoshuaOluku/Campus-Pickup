@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from './CartContext'
 import { useAuth } from '../auth/AuthContext'
-import { executeDemoCheckout } from '../checkout/CheckoutService'
-import { ArrowLeft, Minus, Plus, Trash2, Clock } from 'lucide-react'
+import { createPendingOrder } from '../checkout/CheckoutService'
+import { ArrowLeft, Minus, Plus, Trash2, Clock, Home } from 'lucide-react'
 
 const PICKUP_SLOTS = [
   'ASAP (15-20 mins)',
@@ -33,7 +33,7 @@ export default function CartReviewPage() {
     try {
       const vendorId = items[0].vendor_id 
       
-      await executeDemoCheckout({
+      await createPendingOrder({
         vendorId,
         campusId: profile.campus_id,
         pickupSlot: selectedSlot,
@@ -65,10 +65,8 @@ export default function CartReviewPage() {
     <div className="min-h-screen bg-off-white pb-32">
       <div className="bg-surface border-b border-soft-slate sticky top-0 z-10">
         <div className="max-w-sm mx-auto px-4 py-3 flex items-center">
-          <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-campus-blue">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="font-bold text-ink text-lg ml-2">Review Cart</h1>
+          <div className="flex items-center gap-1"><button onClick={() => navigate(-1)} aria-label="Go back" className="p-2 -ml-2 text-campus-blue"><ArrowLeft className="w-6 h-6" /></button><button onClick={() => navigate('/')} aria-label="Go home" className="p-2 text-campus-blue"><Home className="w-5 h-5" /></button></div>
+          <h1 className="font-bold text-ink text-lg ml-2">Your cart</h1>
         </div>
       </div>
 
@@ -139,7 +137,7 @@ export default function CartReviewPage() {
                 Processing...
               </>
             ) : (
-              'Confirm Order'
+              'Place order'
             )}
           </button>
         </div>

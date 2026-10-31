@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../auth/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Clock, ArrowRight } from 'lucide-react'
+import { MapPin, Clock, ArrowRight, ArrowLeft, Home } from 'lucide-react'
 
 interface Campus {
   id: string
@@ -33,6 +33,8 @@ export default function CampusSelectPage() {
       })
   }, [])
 
+  const isUnlocked = (campus: Campus) => /UNN|University of Nigeria/i.test(campus.short_code + ' ' + campus.name)
+
   async function handleContinue() {
     if (!selected) return
     setSaving(true)
@@ -45,6 +47,10 @@ export default function CampusSelectPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f8fa] px-4 py-10">
+      <div className="mx-auto mb-6 flex max-w-xl items-center justify-between">
+        <button type="button" onClick={() => navigate('/login')} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-orange-300"><ArrowLeft size={16}/> Back</button>
+        <button type="button" onClick={() => navigate('/')} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-[#123b5d] hover:border-orange-300"><Home size={16}/> Home</button>
+      </div>
       <section className="mx-auto max-w-xl">
         <div className="mb-8 text-center">
           <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-orange-100 text-orange-600"><MapPin size={27}/></span>
@@ -56,17 +62,17 @@ export default function CampusSelectPage() {
         {loading ? <div className="space-y-3">{[1,2,3].map(i=><div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-200"/>)}</div> :
           <div className="grid gap-3 sm:grid-cols-2">
             {campuses.map(campus => (
-              <button key={campus.id} type="button" disabled={!campus.is_active}
+              <button key={campus.id} type="button" disabled={!isUnlocked(campus)}
                 onClick={() => setSelected(campus.id)}
-                className={`relative rounded-2xl border p-4 text-left transition ${!campus.is_active ? 'cursor-not-allowed border-slate-200 bg-slate-100/80 opacity-80' : selected===campus.id ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-100' : 'border-slate-200 bg-white hover:border-orange-300 hover:shadow-sm'}`}>
+                className={`relative rounded-2xl border p-4 text-left transition ${!isUnlocked(campus) ? 'cursor-not-allowed border-slate-200 bg-slate-100/80 opacity-80' : selected===campus.id ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-100' : 'border-slate-200 bg-white hover:border-orange-300 hover:shadow-sm'}`}>
                 <div className="flex items-start justify-between gap-2">
-                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${campus.is_active ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-500'}`}><MapPin size={19}/></span>
-                  {!campus.is_active && <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">Coming soon</span>}
-                  {campus.is_active && selected===campus.id && <span className="text-xs font-bold text-orange-600">Selected</span>}
+                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${isUnlocked(campus) ? 'bg-orange-100 text-orange-600' : 'bg-slate-200 text-slate-500'}`}><MapPin size={19}/></span>
+                  {!isUnlocked(campus) && <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">Coming soon</span>}
+                  {isUnlocked(campus) && selected===campus.id && <span className="text-xs font-bold text-orange-600">Selected</span>}
                 </div>
                 <h2 className="mt-4 font-bold text-slate-900">{campus.name}</h2>
                 <p className="mt-1 text-xs text-slate-500">{campus.city}, {campus.state}</p>
-                {!campus.is_active && <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500"><Clock size={13}/> We’re working on bringing Campus Pick-Up here.</p>}
+                {!isUnlocked(campus) && <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500"><Clock size={13}/> We’re working on bringing Campus Pick-Up here.</p>}
               </button>
             ))}
           </div>}

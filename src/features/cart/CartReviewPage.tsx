@@ -41,7 +41,8 @@ export default function CartReviewPage() {
       })
 
       clearCart()
-      navigate('/orders')
+      const reference = typeof orderId === 'string' ? orderId : (orderId as any)?.id || (orderId as any)?.order_id || 'demo'
+      navigate(`/payment/${reference}`)
       
     } catch (err: any) {
       setError(err.message || 'Checkout failed. Please try again.')

@@ -56,6 +56,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: '/payment/:orderId',
+    element: (
+      <ProtectedRoute>
+        <PaymentPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/orders',
     element: (
       <ProtectedRoute>

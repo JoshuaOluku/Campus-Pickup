@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Building2, CreditCard, ShieldAlert, CheckCircle2, X, QrCode, Copy } from 'lucide-react'
+import { ArrowLeft, Building2, CreditCard, ShieldAlert, CheckCircle2, X, QrCode } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 
 type Method = 'transfer' | 'card'

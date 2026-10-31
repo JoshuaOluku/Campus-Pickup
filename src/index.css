@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
 @layer base {
-  body {
-    @apply bg-off-white text-ink font-sans antialiased;
+  html { font-family: 'DM Sans', Inter, system-ui, sans-serif; }
+  body { @apply bg-off-white text-ink antialiased; margin: 0; min-width: 320px; }
+  button, input, select, textarea { font: inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid rgba(249, 115, 22, .35);
+    outline-offset: 2px;
   }
 }

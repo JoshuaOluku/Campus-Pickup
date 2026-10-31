@@ -33,7 +33,7 @@ export default function CartReviewPage() {
     try {
       const vendorId = items[0].vendor_id 
       
-      await createPendingOrder({
+      const orderId = await createPendingOrder({
         vendorId,
         campusId: profile.campus_id,
         pickupSlot: selectedSlot,

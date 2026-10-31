@@ -27,8 +27,8 @@ interface AuthContextType {
   profile: Profile | null
   vendor: VendorInfo | null
   loading: boolean
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: Error | null; session: Session | null }>
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; session: Session | null }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>
 }
@@ -43,71 +43,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let active = true
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!active) return
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
+      if (session?.user) void fetchProfile(session.user.id)
       else setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else {
+      if (session?.user) {
+        setLoading(true)
+        void fetchProfile(session.user.id)
+      } else {
         setProfile(null)
         setVendor(null)
         setLoading(false)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => { active = false; subscription.unsubscribe() }
   }, [])
 
   async function fetchProfile(userId: string) {
     try {
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle()
-
+        .from('profiles').select('*').eq('id', userId).maybeSingle()
       if (profileError) throw profileError
-      
       if (profileData) {
         setProfile(profileData as Profile)
-        
         if (profileData.role === 'vendor') {
-          const { data: staffData, error: staffError } = await supabase
-            .from('vendor_staff')
-            .select(`id, role, vendor:vendor_id (id, name, slug)`)
-            .eq('profile_id', userId)
-            .eq('is_active', true)
-            .maybeSingle()
-
-          if (!staffError && staffData) {
+          const { data: staffData } = await supabase
+            .from('vendor_staff').select('id, role, vendor:vendor_id (id, name, slug)')
+            .eq('profile_id', userId).eq('is_active', true).maybeSingle()
+          if (staffData) {
             const v = Array.isArray(staffData.vendor) ? staffData.vendor[0] : staffData.vendor
-            if (v) {
-              setVendor({
-                id: v.id,
-                name: v.name,
-                slug: v.slug,
-                staff_role: staffData.role
-              })
-            } else {
-              setVendor(null)
-            }
-          } else {
-            setVendor(null)
-          }
-        } else {
-          setVendor(null)
-        }
+            setVendor(v ? { id: v.id, name: v.name, slug: v.slug, staff_role: staffData.role } : null)
+          } else setVendor(null)
+        } else setVendor(null)
       } else {
         setProfile(null)
         setVendor(null)
       }
-    } catch (err) {
+    } catch {
       setProfile(null)
       setVendor(null)
     } finally {
@@ -115,14 +96,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function signUp(email: string, password: string) {
-    const { error } = await supabase.auth.signUp({ email, password })
-    return { error: error as Error | null }
+  async function signUp(email: string, password: string, fullName: string, phone: string) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, phone } }
+    })
+    return { error: error as Error | null, session: data.session }
   }
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error as Error | null }
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    return { error: error as Error | null, session: data.session }
   }
 
   async function signOut() {
@@ -133,22 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function updateProfile(updates: Partial<Profile>) {
     if (!user) return { error: new Error('Not authenticated') as Error }
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id)
-
-    if (!error) {
-      setProfile(prev => prev ? { ...prev, ...updates } : null)
-    }
+    const { error } = await supabase.from('profiles').update(updates).eq('id', user.id)
+    if (!error) setProfile(prev => prev ? { ...prev, ...updates } : null)
     return { error: error as Error | null }
   }
 
-  return (
-    <AuthContext.Provider value={{ user, session, profile, vendor, loading, signUp, signIn, signOut, updateProfile }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user, session, profile, vendor, loading, signUp, signIn, signOut, updateProfile }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

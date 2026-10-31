@@ -33,7 +33,7 @@ export default function CampusSelectPage() {
       })
   }, [])
 
-  const isUnlocked = (campus: Campus) => /UNN|University of Nigeria/i.test(campus.short_code + ' ' + campus.name)
+  const isUnlocked = (campus: Campus) => /\\bUNN\\b|University of Nigeria.*Nsukka|Nsukka.*University of Nigeria/i.test(campus.short_code + ' ' + campus.name)
 
   async function handleContinue() {
     if (!selected) return

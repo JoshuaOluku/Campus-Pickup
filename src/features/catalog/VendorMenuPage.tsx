@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase/client'
 import { useCart } from '../cart/CartContext'
-import { ArrowLeft, Plus, ShoppingCart, Clock, Check } from 'lucide-react'
+import { ArrowLeft, Plus, ShoppingCart, Clock, Check, Home } from 'lucide-react'
 
 interface Category { id: string; name: string }
 interface Product { id: string; name: string; description: string; price: number; category_id: string; image_url: string | null }
@@ -66,7 +66,7 @@ export default function VendorMenuPage() {
     <main className="min-h-screen bg-[#f7f8fa] pb-32">
       <header className="sticky top-0 z-20 border-b border-slate-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <button onClick={()=>navigate(-1)} aria-label="Go back" className="rounded-xl p-2 text-[#123b5d] hover:bg-slate-100"><ArrowLeft size={21}/></button>
+          <div className="flex items-center gap-1"><button onClick={()=>navigate(-1)} aria-label="Go back" className="rounded-xl p-2 text-[#123b5d] hover:bg-slate-100"><ArrowLeft size={21}/></button><button onClick={()=>navigate('/')} aria-label="Go home" className="rounded-xl p-2 text-[#123b5d] hover:bg-slate-100"><Home size={20}/></button></div>
           <div className="min-w-0 flex-1 px-3 text-center"><h1 className="truncate font-extrabold text-[#123b5d]">{vendor?.name}</h1><p className="text-xs text-slate-500">Menu · Order ahead, collect when ready</p></div>
           <Link to="/cart" aria-label="View cart" className="relative rounded-xl p-2 text-[#123b5d] hover:bg-slate-100"><ShoppingCart size={21}/>{itemCount>0&&<span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">{itemCount}</span>}</Link>
         </div>
@@ -91,7 +91,7 @@ export default function VendorMenuPage() {
           </section>
         })}
       </section>
-      {vendorCount>0&&<div className="fixed inset-x-0 bottom-4 z-30 px-4"><div className="mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl bg-[#123b5d] p-3 text-white shadow-2xl ring-1 ring-white/15"><div className="min-w-0"><p className="text-sm font-bold">{vendorCount} item{vendorCount===1?'':'s'} selected</p><p className="text-xs text-blue-100">{formatPrice(vendorTotal)} · {vendor?.name}</p></div><Link to="/cart" className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white hover:bg-orange-600">View cart <ArrowLeft className="rotate-180" size={16}/></Link></div></div>}
+      {vendorCount>0&&<div className="fixed inset-x-0 bottom-4 z-30 px-4"><div className="mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl bg-[#123b5d] p-3 text-white shadow-2xl ring-1 ring-white/15"><div className="flex min-w-0 items-center gap-3"><div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/20 bg-white/10"><img src={vendorItems[0]?.image_url || foodPhotos[0]} alt="" className="h-full w-full object-cover"/><span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-orange-500 px-1 text-[10px] font-bold">{vendorCount}</span></div><div className="min-w-0"><p className="text-sm font-bold">{vendorItems[0]?.name || 'Your selection'}{vendorItems.length>1 ? ' +' + (vendorItems.length-1) + ' more' : ''}</p><p className="truncate text-xs text-blue-100">{formatPrice(vendorTotal)} · {vendor?.name}</p><p className="text-[10px] text-blue-200">Mini cart preview</p></div></div><Link to="/cart" className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white hover:bg-orange-600">View cart <ArrowLeft className="rotate-180" size={16}/></Link></div></div>}
     </main>
   )
 }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase/client'
 import { useCart } from '../cart/CartContext'
-import { ArrowLeft, Plus, ShoppingCart, Clock, Check, Minus } from 'lucide-react'
+import { ArrowLeft, Plus, ShoppingCart, Clock, Check } from 'lucide-react'
 
 interface Category { id: string; name: string }
 interface Product { id: string; name: string; description: string; price: number; category_id: string; image_url: string | null }
@@ -28,7 +28,7 @@ function imageFor(product: Product) {
 export default function VendorMenuPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { addToCart, items, itemCount, total } = useCart()
+  const { addToCart, items, itemCount } = useCart()
   const [vendor, setVendor] = useState<Vendor | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])

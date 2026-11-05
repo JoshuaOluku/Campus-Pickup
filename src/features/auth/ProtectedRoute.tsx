@@ -44,7 +44,8 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
 
   // Admin specific logic
   if (location.pathname.startsWith('/admin')) {
-    if (profile?.role !== 'admin') {
+    const isFounderOwner = user.email?.toLowerCase() === 'joshuaoluku1@gmail.com'
+    if (!isFounderOwner || profile?.role !== 'admin') {
       return <Navigate to="/" replace />
     }
     return <>{children}</>

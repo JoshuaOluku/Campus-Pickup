@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import VendorApprovals from './VendorApprovals'
 import CampusManager from './CampusManager'
+import FounderAnalytics from './FounderAnalytics'
 import { LayoutDashboard, Store, MapPin, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'overview' | 'vendors' | 'campuses'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'vendors' | 'campuses'>('overview')
 
   async function handleLogout() {
     await signOut()
@@ -44,6 +45,14 @@ export default function AdminDashboard() {
           >
             <span className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Overview</span>
           </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`py-3 px-1 text-sm font-semibold border-b-2 transition-colors ${
+              activeTab === 'analytics' ? 'border-electric-orange text-campus-blue' : 'border-transparent text-slate-muted hover:text-ink'
+            }`}
+          >
+            <span className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Founder Analytics</span>
+          </button>
           <button 
             onClick={() => setActiveTab('vendors')}
             className={`py-3 px-1 text-sm font-semibold border-b-2 transition-colors ${
@@ -66,6 +75,7 @@ export default function AdminDashboard() {
       {/* Content Area */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         {activeTab === 'overview' && <AdminOverview />}
+        {activeTab === 'analytics' && <FounderAnalytics />}
         {activeTab === 'vendors' && <VendorApprovals />}
         {activeTab === 'campuses' && <CampusManager />}
       </main>

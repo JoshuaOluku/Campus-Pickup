@@ -19,6 +19,12 @@ export interface VendorInfo {
   name: string
   slug: string
   staff_role: string
+  status: string
+  is_approved: boolean
+  is_open: boolean
+  category: string
+  campus_id: string
+  pickup_location: string | null
 }
 
 interface AuthContextType {
@@ -31,6 +37,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null; session: Session | null }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -75,15 +82,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (profileError) throw profileError
       if (profileData) {
         setProfile(profileData as Profile)
-        if (profileData.role === 'vendor') {
-          const { data: staffData } = await supabase
-            .from('vendor_staff').select('id, role, vendor:vendor_id (id, name, slug)')
-            .eq('profile_id', userId).eq('is_active', true).maybeSingle()
-          if (staffData) {
-            const v = Array.isArray(staffData.vendor) ? staffData.vendor[0] : staffData.vendor
-            setVendor(v ? { id: v.id, name: v.name, slug: v.slug, staff_role: staffData.role } : null)
-          } else setVendor(null)
-        } else setVendor(null)
+        const { data: staffData } = await supabase
+          .from('vendor_staff').select('role, vendor:vendor_id (id, name, slug, status, is_approved, is_open, category, campus_id, pickup_location)')
+          .eq('profile_id', userId).eq('is_active', true).maybeSingle()
+        if (staffData) {
+          const v = Array.isArray(staffData.vendor) ? staffData.vendor[0] : staffData.vendor
+          setVendor(v ? { ...v, staff_role: staffData.role } : null)
+        } else {
+          const { data: ownedVendor } = await supabase
+            .from('vendors').select('id, name, slug, status, is_approved, is_open, category, campus_id, pickup_location')
+            .eq('owner_id', userId).maybeSingle()
+          setVendor(ownedVendor ? { ...ownedVendor, staff_role: 'owner' } : null)
+        }
       } else {
         setProfile(null)
         setVendor(null)
@@ -94,6 +104,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function refreshProfile() {
+    if (user) await fetchProfile(user.id)
   }
 
   async function signUp(email: string, password: string, fullName: string, phone: string) {
@@ -123,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null }
   }
 
-  return <AuthContext.Provider value={{ user, session, profile, vendor, loading, signUp, signIn, signOut, updateProfile }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, session, profile, vendor, loading, signUp, signIn, signOut, updateProfile, refreshProfile }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

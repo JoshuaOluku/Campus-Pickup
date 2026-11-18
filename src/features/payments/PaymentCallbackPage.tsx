@@ -1,3 +1,4 @@
+import FloatingLoader from '../../components/ui/FloatingLoader'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { verifyPaystackPayment } from '../../lib/payments/paystackService'
@@ -42,6 +43,8 @@ export default function PaymentCallbackPage() {
 
     verify()
   }, [searchParams, navigate, clearCart])
+
+  if (status === 'verifying') return <FloatingLoader label="Verifying your payment" />
 
   return (
     <div className="min-h-screen bg-off-white flex items-center justify-center p-4">

@@ -1,9 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import LoginPage from '../features/auth/LoginPage'
 import CampusSelectPage from '../features/campuses/CampusSelectPage'
 import ProtectedRoute from '../features/auth/ProtectedRoute'
 import VendorListPage from '../features/vendors/VendorListPage'
-import VendorDashboard from '../features/vendors/VendorDashboard'
 import VendorMenuPage from '../features/catalog/VendorMenuPage'
 import CartReviewPage from '../features/cart/CartReviewPage'
 import OrderTrackingPage from '../features/orders/OrderTrackingPage'
@@ -48,11 +47,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/vendor',
-    element: (
-      <ProtectedRoute>
-        <VendorDashboard />
-      </ProtectedRoute>
-    ),
+    element: <Navigate to="/vendor-portal/dashboard" replace />,
   },
   {
     path: '/vendor/:slug',

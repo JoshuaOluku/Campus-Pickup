@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Activity, AlertCircle, ArrowRight, BadgeCheck, Camera, Check, CheckCircle2, ChefHat, Clock3, Eye, EyeOff, LayoutDashboard, LogOut, Package, Plus, QrCode, RefreshCw, Search, Settings, ShieldCheck, ShoppingBag, Store, Utensils, Wallet, X } from 'lucide-react'
+import { Activity, AlertCircle, ArrowRight, BadgeCheck, Camera, Check, CheckCircle2, ChefHat, Clock3, Eye, EyeOff, LayoutDashboard, LogOut, Package, Plus, QrCode, RefreshCw, Search, Settings, ShieldCheck, ShoppingBag, Store, Wallet, X } from 'lucide-react'
 import { supabase } from '../../lib/supabase/client'
 import { useAuth } from '../auth/AuthContext'
 import FloatingLoader from '../../components/ui/FloatingLoader'

@@ -13,3 +13,21 @@
     outline-offset: 2px;
   }
 }
+
+.floating-loader-scene { isolation: isolate; }
+.floating-loader-icon {
+  position: absolute; display: grid; place-items: center; width: 48px; height: 48px;
+  border: 1px solid rgba(18,59,93,.08); border-radius: 16px;
+  background: #fff; color: #f97316; box-shadow: 0 10px 25px rgba(18,59,93,.10);
+  animation: floating-loader-bob 1.55s ease-in-out infinite;
+}
+.floating-loader-one { left: 4px; top: 23px; animation-delay: 0s; }
+.floating-loader-two { left: 42px; top: 2px; color: #123b5d; animation-delay: .18s; }
+.floating-loader-three { right: 2px; top: 24px; animation-delay: .36s; }
+@keyframes floating-loader-bob {
+  0%, 100% { transform: translateY(5px) rotate(-4deg); }
+  50% { transform: translateY(-9px) rotate(4deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-loader-icon { animation: none; }
+}

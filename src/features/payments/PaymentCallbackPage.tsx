@@ -49,15 +49,7 @@ export default function PaymentCallbackPage() {
   return (
     <div className="min-h-screen bg-off-white flex items-center justify-center p-4">
       <div className="max-w-sm w-full bg-surface rounded-card shadow-lg p-8 text-center">
-        {status === 'verifying' && (
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 border-4 border-campus-blue border-t-transparent rounded-full animate-spin mb-4" />
-            <h2 className="text-xl font-bold text-campus-blue mb-2">Verifying Payment</h2>
-            <p className="text-slate-muted text-sm">{message}</p>
-          </div>
-        )}
-
-        {status === 'success' && (
+{status === 'success' && (
           <div className="flex flex-col items-center">
             <CheckCircle className="w-16 h-16 text-fresh-green mb-4" />
             <h2 className="text-xl font-bold text-fresh-green mb-2">Payment Successful!</h2>

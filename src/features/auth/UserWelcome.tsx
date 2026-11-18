@@ -8,6 +8,11 @@ export default function UserWelcome() {
   const [returning, setReturning] = useState(false)
 
   useEffect(() => {
+    if (window.location.pathname.startsWith('/vendor-portal')) {
+      setShowWelcome(false)
+      setReturning(false)
+      return
+    }
     if (loading || !user) {
       setShowWelcome(false)
       setReturning(false)

@@ -10,6 +10,22 @@ import OrderTrackingPage from '../features/orders/OrderTrackingPage'
 import AdminDashboard from '../features/admin/AdminDashboard'
 
 export const router = createBrowserRouter([
+
+  {
+    path: '/vendor-portal',
+    lazy: async () => {
+      const module = await import('../features/vendors/VendorPortal')
+      return { Component: module.VendorPortalEntry }
+    },
+  },
+  {
+    path: '/vendor-portal/dashboard',
+    lazy: async () => {
+      const module = await import('../features/vendors/VendorPortal')
+      return { Component: module.VendorPortalDashboard }
+    },
+  },
+
   { 
     path: '/login', 
     element: <LoginPage /> 

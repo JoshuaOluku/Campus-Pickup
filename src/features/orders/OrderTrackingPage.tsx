@@ -9,7 +9,7 @@ interface Order {
   status: string
   total_price: number
   pickup_slot: string
-  pickup_token: string | null
+  pickup_code: string | null
   created_at: string
   vendor: { name: string }
 }
@@ -27,7 +27,7 @@ export default function OrderTrackingPage() {
     async function fetchOrders() {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, status, total_price, pickup_slot, pickup_token, created_at, vendor:vendor_id(name)')
+        .select('id, status, total_price, pickup_slot, pickup_code, created_at, vendor:vendor_id(name)')
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false })
 
@@ -97,7 +97,7 @@ export default function OrderTrackingPage() {
                 {expandedOrderId === order.id && (
                   <div className="border-t border-soft-slate p-4 bg-off-white">
                     <div className="flex flex-col items-center text-center">
-                      {order.pickup_token ? <><p className="text-sm text-slate-muted mb-2">Show this code at pickup</p><div className="bg-white p-3 rounded-lg shadow-sm border border-soft-slate mb-3"><QRCodeSVG value={order.pickup_token} size={120} /></div><p className="text-3xl font-mono font-bold text-campus-blue tracking-widest">{order.pickup_token}</p></> : <p className="rounded-lg bg-orange-50 p-3 text-sm text-orange-800">Payment is not yet confirmed. Your pickup code will appear here once payment is successful.</p>}
+                      {order.status === 'picked_up' ? <p className="rounded-lg bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">Collection confirmed. This order has been picked up.</p> : order.pickup_code ? <><p className="text-sm text-slate-muted mb-2">Show this code at pickup</p><div className="bg-white p-3 rounded-lg shadow-sm border border-soft-slate mb-3"><QRCodeSVG value={order.pickup_code} size={120} /></div><p className="text-3xl font-mono font-bold text-campus-blue tracking-widest">{order.pickup_code}</p></> : <p className="rounded-lg bg-orange-50 p-3 text-sm text-orange-800">Payment is not yet confirmed. Your pickup code will appear here once payment is successful.</p>}
                       <div className="mt-4 w-full text-left bg-surface p-3 rounded-lg border border-soft-slate">
                         <p className="text-xs text-slate-muted flex items-center gap-1">
                           <Clock className="w-3 h-3" /> Pickup Slot

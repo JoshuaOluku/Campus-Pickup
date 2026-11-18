@@ -1,3 +1,4 @@
+import FloatingLoader from '../../components/ui/FloatingLoader'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 import VendorSetupScreen from '../vendors/VendorSetupScreen'
@@ -11,13 +12,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
   const { user, profile, vendor, loading } = useAuth()
   const location = useLocation()
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-off-white">
-        <div className="text-campus-blue font-semibold">Loading...</div>
-      </div>
-    )
-  }
+  if (loading) return <FloatingLoader label="Loading your account" />
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />

@@ -4,13 +4,14 @@ import VendorApprovals from './VendorApprovals'
 import CampusManager from './CampusManager'
 import FounderAnalytics from './FounderAnalytics'
 import RegisteredUsers from './RegisteredUsers'
-import { LayoutDashboard, Store, MapPin, LogOut, Users } from 'lucide-react'
+import SignInActivity from './SignInActivity'
+import { LayoutDashboard, Store, MapPin, LogOut, Users, Clock3 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'users' | 'vendors' | 'campuses'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'users' | 'activity' | 'vendors' | 'campuses'>('overview')
 
   async function handleLogout() {
     await signOut()
@@ -46,6 +47,9 @@ export default function AdminDashboard() {
           <button onClick={() => setActiveTab('users')} className={tabClass('users')}>
             <span className="flex items-center gap-2"><Users className="w-4 h-4" /> Registered Users</span>
           </button>
+          <button onClick={() => setActiveTab('activity')} className={tabClass('activity')}>
+            <span className="flex items-center gap-2"><Clock3 className="w-4 h-4" /> Sign-in Activity</span>
+          </button>
           <button onClick={() => setActiveTab('vendors')} className={tabClass('vendors')}>
             <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Vendor Approvals</span>
           </button>
@@ -59,6 +63,7 @@ export default function AdminDashboard() {
         {activeTab === 'overview' && <AdminOverview />}
         {activeTab === 'analytics' && <FounderAnalytics />}
         {activeTab === 'users' && <RegisteredUsers />}
+        {activeTab === 'activity' && <SignInActivity />}
         {activeTab === 'vendors' && <VendorApprovals />}
         {activeTab === 'campuses' && <CampusManager />}
       </main>

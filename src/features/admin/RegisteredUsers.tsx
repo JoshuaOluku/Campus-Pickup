@@ -7,8 +7,19 @@ type RegisteredUser = {
   full_name: string | null
   email: string | null
   role: string
-  is_onboarded: boolean
   created_at: string
+  last_sign_in_at: string | null
+}
+
+type ActivityResponse = { users?: RegisteredUser[] }
+
+function formatDateTime(value: string | null) {
+  if (!value) return 'Never signed in'
+  return new Date(value).toLocaleString('en-NG', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Africa/Lagos',
+  })
 }
 
 export default function RegisteredUsers() {
@@ -20,11 +31,11 @@ export default function RegisteredUsers() {
   const loadUsers = useCallback(async () => {
     setLoading(true)
     setError('')
-    const { data, error: rpcError } = await supabase.rpc('get_founder_registered_users')
+    const { data, error: rpcError } = await supabase.rpc('get_founder_signin_activity')
     if (rpcError) {
       setError('Registered users could not be loaded. Check that you are signed in with the founder admin account.')
     } else {
-      setUsers((data ?? []) as RegisteredUser[])
+      setUsers(((data as ActivityResponse | null)?.users ?? []) as RegisteredUser[])
     }
     setLoading(false)
   }, [])
@@ -46,7 +57,7 @@ export default function RegisteredUsers() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-campus-blue">Registered users</h2>
-          <p className="text-sm text-slate-muted">All accounts registered on Campus Pick-Up</p>
+          <p className="text-sm text-slate-muted">Account details and each user's most recent sign-in</p>
         </div>
         <button onClick={() => void loadUsers()} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border border-soft-slate bg-surface px-3 py-2 text-sm font-semibold text-campus-blue disabled:opacity-50">
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -84,8 +95,8 @@ export default function RegisteredUsers() {
                   <th className="px-4 py-3 font-semibold">Name</th>
                   <th className="px-4 py-3 font-semibold">Email</th>
                   <th className="px-4 py-3 font-semibold">Role</th>
-                  <th className="px-4 py-3 font-semibold">Onboarding</th>
                   <th className="px-4 py-3 font-semibold">Registered</th>
+                  <th className="px-4 py-3 font-semibold">Last sign-in (WAT)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-soft-slate">
@@ -94,12 +105,8 @@ export default function RegisteredUsers() {
                     <td className="whitespace-nowrap px-4 py-3 font-medium text-ink">{user.full_name?.trim() || 'Name not provided'}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-slate-muted">{user.email || '—'}</td>
                     <td className="whitespace-nowrap px-4 py-3 capitalize text-ink">{user.role}</td>
-                    <td className="whitespace-nowrap px-4 py-3">
-                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${user.is_onboarded ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
-                        {user.is_onboarded ? 'Complete' : 'Pending'}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-muted">{new Date(user.created_at).toLocaleDateString()}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-muted">{new Date(user.created_at).toLocaleDateString('en-NG', { timeZone: 'Africa/Lagos' })}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-muted">{formatDateTime(user.last_sign_in_at)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -107,7 +114,7 @@ export default function RegisteredUsers() {
           </div>
         </div>
       )}
-      <p className="text-xs text-slate-muted">This list is restricted to the founder admin account. It displays profile records, not unconfirmed sign-ups that have not created a profile.</p>
+      <p className="text-xs text-slate-muted">Last sign-in comes from Supabase Auth. Times are displayed in West Africa Time (WAT). This list excludes sign-ups that have not created a profile.</p>
     </section>
   )
 }
